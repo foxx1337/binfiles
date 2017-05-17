@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+SUBLIME_CACHE=~/sublime_cache
+CODE_COMMAND="/c/Program\ Files\ \(x86\)/Microsoft\ VS\ Code/bin/code"
+
+eval $CODE_COMMAND "$@"
+
+if test "$1" == "--desktop"; then
+	eval $CODE_COMMAND
+elif test -t 0; then
+	# Is stdin a terminal?
+	# Stdin is a terminal.
+	# Open code normally.
+	eval $CODE_COMMAND "$@"
+else
+	# Stdin is not a terminal, it must be a pipe.
+	# Pipe stdin to a temporary file, and open it in sublime.
+	FILENAME=$(mktemp -p $SUBLIME_CACHE)
+	cat >"$FILENAME" && eval "$CODE_COMMAND $@ $FILENAME"
+fi
